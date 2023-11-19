@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "95bd29f1-804d-4983-909d-9f2a9412c2b0",
+		"name": "Компания СП ООО \"Sarkor Telecom\" ==> Golang Junior/Junior+ ==> тестовое задание_2023",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27753311",
+		"_collection_link": "https://www.postman.com/avionics-saganist-93502435/workspace/sk-testtask/collection/27753311-95bd29f1-804d-4983-909d-9f2a9412c2b0?action=share&source=collection_link&creator=27753311"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let login = \"admin\";\r",
+									"let password = \"pasadmin\";\r",
+									"\r",
+									"pm.variables.set(\"login_user\", login);\r",
+									"pm.variables.set(\"password_user\", password);\r",
+									"\r",
+									"console.log(pm.variables.get(\"login_user\"));\r",
+									"console.log(pm.variables.get(\"password_user\"));\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "login",
+									"value": "{{login_user}}",
+									"contentType": "",
+									"description": "Type: string. Set by an environment variable.",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{password_user}}",
+									"description": "Type: string. Set by an environment variable.",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "{{$randomFirstName}}",
+									"description": "Type: string. This variable is native to Postman",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "{{$randomInt}}",
+									"description": "Type: int. This variable is native to Postman",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "172.31.226.98:{{HTTP_SERVER_PORT}}/user/register",
+							"host": [
+								"172",
+								"31",
+								"226",
+								"98"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {\r",
+									"    // Извлечь токен из ответа и обновить его в переменной \r",
+									"   let token = pm.cookies.get('SESSTOKEN');\r",
+									"\r",
+									"    // Печатаем значение токена в консоль\r",
+									"    console.log('Token:', token);\r",
+									"    pm.collectionVariables.set(\"jwtToken\", token);\r",
+									"}\r",
+									"\r",
+									"let jwt = pm.collectionVariables.get(\"jwtToken\");\r",
+									"\r",
+									"// Парсим JWT\r",
+									"let jwtParts = jwt.split('.');\r",
+									"let jwtPayload = jwtParts[1];\r",
+									"let decodedPayload = CryptoJS.enc.Base64.parse(jwtPayload);\r",
+									"let decodedString = CryptoJS.enc.Utf8.stringify(decodedPayload);\r",
+									"let jwtData = JSON.parse(decodedString);\r",
+									"console.log(jwt)\r",
+									"\r",
+									"// Проверяем, что поле login не пустое\r",
+									"pm.test(\"Check the existence and non-emptiness of the login field\", function () {\r",
+									"    pm.expect(jwtData).to.have.property('login');\r",
+									"    pm.expect(jwtData.login).to.not.be.empty;\r",
+									"});\r",
+									"// Проверяем наличие и непустоту поля user_id\r",
+									"pm.test(\"Check the existence and non-emptiness of the user_id field\", function () {\r",
+									"    pm.expect(jwtData).to.have.property('user_id');\r",
+									"    pm.expect(jwtData.user_id).to.not.be.null;\r",
+									"    pm.expect(jwtData.user_id).to.not.be.undefined;\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let login = \"admin\";\r",
+									"let password = \"pasadmin\";\r",
+									"\r",
+									"pm.collectionVariables.set(\"login_user\", login);\r",
+									"pm.collectionVariables.set(\"password_user\", password);\r",
+									"\r",
+									"console.log(pm.collectionVariables.get(\"login_user\"));\r",
+									"console.log(pm.collectionVariables.get(\"password_user\"));\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"login\":\"{{login_user}}\",\r\n  \"password\": \"{{password_user}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/auth",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Проверка наличия обязательных полей\r",
+									"pm.test(\"Проверка наличия id\", function () {\r",
+									"    pm.expect(pm.response.json()[0]).to.have.property(\"id\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка наличия name\", function () {\r",
+									"    pm.expect(pm.response.json()[0]).to.have.property(\"name\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка наличия age\", function () {\r",
+									"    pm.expect(pm.response.json()[0]).to.have.property(\"age\");\r",
+									"});\r",
+									"\r",
+									"// Проверка типов данных\r",
+									"pm.test(\"Проверка типа данных для id\", function () {\r",
+									"    pm.expect(pm.response.json()[0].id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка типа данных для name\", function () {\r",
+									"    pm.expect(pm.response.json()[0].name).to.be.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка типа данных для age\", function () {\r",
+									"    pm.expect(pm.response.json()[0].age).to.be.a(\"number\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let jwt = pm.collectionVariables.get(\"jwtToken\");\r",
+									"console.log(jwt)\r",
+									"pm.request.headers.upsert({ key: 'Cookie', value: `SESSTOKEN=${jwt}` })\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "SESSTOKEN={{jwtToken}};",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/:name",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "Mozelle"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "phone",
+			"item": [
+				{
+					"name": "phone",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Генерируем случайное число, ограниченное 12 цифрами\r",
+									"let randomPhone = Math.floor(Math.random() * Math.pow(10, 12)).toString().padStart(12, '0');\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\", randomPhone);\r",
+									"console.log(pm.collectionVariables.get(\"randomPhoneNumber\"));\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\":\"{{randomPhoneNumber}}\",\r\n    \"description\":\"Описание номера телефона\",\r\n    \"is_fax\":false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/phone",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"phone"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "phone",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let resBody;\r",
+									"// Парсим JSON-ответ\r",
+									"resBody = pm.response.json();\r",
+									"console.log(resBody)\r",
+									"\r",
+									"// Проверяем наличие обязательных полей\r",
+									"pm.test(\"Проверка наличия user_id\", function() {\r",
+									"    pm.expect(resBody[0]).to.have.property(\"user_id\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка наличия phone\", function() {\r",
+									"    pm.expect(resBody[0]).to.have.property(\"phone\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка наличия description\", function() {\r",
+									"    pm.expect(resBody[0]).to.have.property(\"description\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка наличия is_fax\", function() {\r",
+									"    pm.expect(resBody[0]).to.have.property(\"is_fax\");\r",
+									"});\r",
+									"\r",
+									"// Пример проверок значений\r",
+									"pm.test(\"Проверка, что user_id является числом\", function() {\r",
+									"    pm.expect(resBody[0].user_id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка, что phone является строкой\", function() {\r",
+									"    pm.expect(resBody[0].phone).to.be.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Проверка, что is_fax является булевым значением\", function() {\r",
+									"    pm.expect(resBody[0].is_fax).to.be.a(\"boolean\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/phone?q={{randomPhoneNumber}}",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"phone"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{randomPhoneNumber}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "phone",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/phone?phone_id=1&phone={{randomPhoneNumber}}&is_fax=true&description=Что-то новенькое",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"phone"
+							],
+							"query": [
+								{
+									"key": "phone_id",
+									"value": "1"
+								},
+								{
+									"key": "phone",
+									"value": "{{randomPhoneNumber}}"
+								},
+								{
+									"key": "is_fax",
+									"value": "true"
+								},
+								{
+									"key": "description",
+									"value": "Что-то новенькое"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "phone",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let phone_id_delet_set = 1;\r",
+									"\r",
+									"pm.variables.set(\"phone_id-delet\", phone_id_delet_set);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}/user/phone/{{phone_id-delet}}",
+							"host": [
+								"{{HTTP_SERVER_ADDRESS}}"
+							],
+							"port": "{{HTTP_SERVER_PORT}}",
+							"path": [
+								"user",
+								"phone",
+								"{{phone_id-delet}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "checking server started",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HTTP_SERVER_ADDRESS}}:{{HTTP_SERVER_PORT}}",
+					"host": [
+						"{{HTTP_SERVER_ADDRESS}}"
+					],
+					"port": "{{HTTP_SERVER_PORT}}"
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "HTTP_SERVER_ADDRESS",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "HTTP_SERVER_PORT",
+			"value": ""
+		},
+		{
+			"key": "jwtToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "phone_id-delet",
+			"value": ""
+		},
+		{
+			"key": "login_user",
+			"value": ""
+		},
+		{
+			"key": "password_user",
+			"value": ""
+		},
+		{
+			"key": "randomPhoneNumber",
+			"value": ""
+		}
+	]
+}
